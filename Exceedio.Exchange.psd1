@@ -12,7 +12,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '0.0.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -33,7 +33,7 @@ Copyright = '(c) Jeff Reese. All rights reserved.'
 Description = 'This module contains cmdlets for standardizing the configuration of Exchange Online and related policies including Microsoft Defender for Office 365.'
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -45,7 +45,7 @@ Description = 'This module contains cmdlets for standardizing the configuration 
 # DotNetFrameworkVersion = ''
 
 # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# ClrVersion = ''
+ClrVersion = '4.0'
 
 # Processor architecture (None, X86, Amd64) required by this module
 # ProcessorArchitecture = ''
@@ -69,7 +69,11 @@ RequiredModules = @('ExchangeOnlineManagement')
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('*-Exceedio*')
+FunctionsToExport = @(
+    'Connect-ExceedioExchangeOnline',
+    'Get-ExceedioSafeLinksPolicy',
+    'New-ExceedioSafeLinksPolicy'
+)
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -95,13 +99,13 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('exchange','eop','mdop')
 
         # A URL to the license for this module.
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/exceedio/Exceedio.Exchange'
 
         # A URL to an icon representing this module.
         # IconUri = ''
@@ -116,7 +120,7 @@ PrivateData = @{
         # RequireLicenseAcceptance = $false
 
         # External dependent modules of this module
-        # ExternalModuleDependencies = @()
+        ExternalModuleDependencies = @('ExchangeOnlineManagement')
 
     } # End of PSData hashtable
 

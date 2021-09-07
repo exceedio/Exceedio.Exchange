@@ -1,4 +1,18 @@
 function Connect-ExceedioExchangeOnline {
+    <#
+    .SYNOPSIS
+    Connects to Exchange Online.
+    .PARAMETER UserPrincipalName
+    Username in username@contoso.com format.
+    .PARAMETER DelegatedOrganization
+    Domain name in contoso.com format.
+    .EXAMPLE
+    Connect-ExceedioExchangeOnline -UserPrincipalName alice@contoso.com -DelegatedOrganization fabrikam.com
+    .NOTES
+    This is a helper function for Connect-ExchangeOnline which is part of the Exchange Online PowerShell V2
+    module. See https://docs.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps
+    for details about that function.
+    #>
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -12,9 +26,19 @@ function Connect-ExceedioExchangeOnline {
 }
 
 function Get-ExceedioSafeLinksPolicy {
+    <#
+    .SYNOPSIS
+    Retrieves and audits the default Safe Links policy and lists the recipient(s) and/or recipient domain(s)
+    that the policy applies to.
+    .EXAMPLE
+    Get-ExceedioSafeLinksPolicy
+    .NOTES
+    Use Get-SafeLinksPolicy from the Exchange Online PowerShell V2 module to see all details for a specific
+    Safe Links policy.
+    #>
     $policy = Get-SafeLinksPolicy -Identity Default
     if (-not $policy) {
-        Write-Warning "No Safe Links named 'Default' exists"
+        Write-Warning "No Safe Links policy named 'Default' exists"
         return
     }
     $rule = $policy | Get-SafeLinksRule
@@ -32,6 +56,24 @@ function Get-ExceedioSafeLinksPolicy {
 }
 
 function New-ExceedioSafeLinksPolicy {
+    <#
+    .SYNOPSIS
+    Creates a standard Safe Links policy and applies it to recipient(s) or recipient domain(s).
+    .PARAMETER Name
+    The name of the policy. Defaults to 'Default'
+    .PARAMETER Users
+    Comma-separated list of recipients that the policy applies to.
+    .PARAMETER Users
+    Comma-separated list of domain names that the policy applies to.
+    .EXAMPLE
+    New-ExceedioSafeLinksPolicy -Users pilotuser1@fabrikam.com,pilotuser2@fabrikam.com
+    .EXAMPLE
+    New-ExceedioSafeLinksPolicy -Domains fabrikam.com
+    .NOTES
+    Running this after the first time will overwrite the existing policy with the same name. Normally
+    you would run this first to set up a list of pilot users and then run it again at the end of the
+    pilot to apply to the entire domain.
+    #>
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -89,9 +131,19 @@ function New-ExceedioSafeLinksPolicy {
 }
 
 function Get-ExceedioSafeAttachmentPolicy {
+    <#
+    .SYNOPSIS
+    Retrieves and audits the default Safe Attachment policy and lists the recipient(s) and/or recipient domain(s)
+    that the policy applies to.
+    .EXAMPLE
+    Get-ExceedioSafeAttachmentPolicy
+    .NOTES
+    Use Get-SafeAttachmentPolicy from the Exchange Online PowerShell V2 module to see all details for a specific
+    Safe Attachment policy.
+    #>
     $policy = Get-SafeAttachmentPolicy -Identity Default
     if (-not $policy) {
-        Write-Warning "No Safe Links named 'Default' exists"
+        Write-Warning "No Safe Attachment policy named 'Default' exists"
         return
     }
     $rule = $policy | Get-SafeAttachmentRule
@@ -107,6 +159,24 @@ function Get-ExceedioSafeAttachmentPolicy {
 }
 
 function New-ExceedioSafeAttachmentPolicy {
+    <#
+    .SYNOPSIS
+    Creates a standard Safe Attachment policy and applies it to recipient(s) or recipient domain(s).
+    .PARAMETER Name
+    The name of the policy. Defaults to 'Default'
+    .PARAMETER Users
+    Comma-separated list of recipients that the policy applies to.
+    .PARAMETER Users
+    Comma-separated list of domain names that the policy applies to.
+    .EXAMPLE
+    New-ExceedioSafeAttachmentPolicy -Users pilotuser1@fabrikam.com,pilotuser2@fabrikam.com
+    .EXAMPLE
+    New-ExceedioSafeAttachmentPolicy -Domains fabrikam.com
+    .NOTES
+    Running this after the first time will overwrite the existing policy with the same name. Normally
+    you would run this first to set up a list of pilot users and then run it again at the end of the
+    pilot to apply to the entire domain.
+    #>
     [CmdletBinding()]
     param (
         [Parameter()]

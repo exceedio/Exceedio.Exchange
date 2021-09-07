@@ -122,7 +122,7 @@ PrivateData = @{
         # RequireLicenseAcceptance = $false
 
         # External dependent modules of this module
-        ExternalModuleDependencies = @('ExchangeOnlineManagement')
+        # ExternalModuleDependencies = @()
 
     } # End of PSData hashtable
 

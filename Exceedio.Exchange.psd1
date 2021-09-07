@@ -12,7 +12,7 @@
 RootModule = 'Exceedio.Exchange.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.2'
+ModuleVersion = '0.0.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -33,7 +33,7 @@ Copyright = '(c) Jeff Reese. All rights reserved.'
 Description = 'This module contains cmdlets for standardizing the configuration of Exchange Online and related policies including Microsoft Defender for Office 365.'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '5.1'
+PowerShellVersion = '7.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''

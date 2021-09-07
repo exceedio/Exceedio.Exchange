@@ -22,6 +22,11 @@ function Connect-ExceedioExchangeOnline {
         [String]
         $DelegatedOrganization
     )
+    $module = Get-InstalledModule -Name ExchangeOnlineManagement
+    if ($null -eq $module -or $module.Version -lt '2.0.5') {
+        Write-Warning "Module ExchangeOnlineManagement doesn't exist or is out of date; Install-Module ExchangeOnlineManagement -AllowClobber -Force"
+        return
+    }
     Connect-ExchangeOnline -UserPrincipalName $UserPrincipalName -DelegatedOrganization $DelegatedOrganization
 }
 

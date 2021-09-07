@@ -28,7 +28,7 @@ Update-Module -Name Exceedio.Exchange
 To connect to Exchange Online, use the `Connect-ExceedioExchangeOnline` cmdlet:
 
 ```powershell
-Connect-ExceedioExchangeOnline -UserPrincipalName username@myorganization.com -DelegatedOrganization contoso.com
+Connect-ExceedioExchangeOnline -UserPrincipalName alice@contoso.com -DelegatedOrganization fabrikam.com
 ```
 
 ### Listing Microsoft Defender for Office 365 SafeLinks policies
@@ -39,14 +39,46 @@ Get-ExceedioSafeLinksPolicy
 
 ### Creating a new Microsoft Defender for Office 365 SafeLinks policy
 
-To create a new policy using the name of 'Default':
+To create a new policy using the name of 'Default' that applies to specific user(s):
 
 ```powershell
-New-ExceedioSafeLinksPolicy
+New-ExceedioSafeLinksPolicy -Users pilotuser1@fabrikam.com,pilotuser2@fabrikam.com
 ```
 
-To create a new policy using a custom name:
+To create a new policy using the name of 'Default' that applies to specific domain(s):
 
 ```powershell
-New-ExceedioSafeLinksPolicy -Name MyCustomPolicyName
+New-ExceedioSafeLinksPolicy -Domains fabrikam.com
+```
+
+To create a new policy using a custom name that applies to specific domain(s):
+
+```powershell
+New-ExceedioSafeLinksPolicy -Name 'FabrikamPolicy' -Domains fabrikam.com
+```
+
+### Listing Microsoft Defender for Office 365 SafeAttachment policies
+
+```powershell
+Get-ExceedioSafeAttachmentPolicy
+```
+
+### Creating a new Microsoft Defender for Office 365 SafeAttachment policy
+
+To create a new policy using the name of 'Default' that applies to specific user(s):
+
+```powershell
+New-ExceedioSafeAttachmentPolicy -Users pilotuser1@fabrikam.com,pilotuser2@fabrikam.com
+```
+
+To create a new policy using the name of 'Default' that applies to specific domain(s):
+
+```powershell
+New-ExceedioSafeAttachmentPolicy -Domains fabrikam.com
+```
+
+To create a new policy using a custom name that applies to specific domain(s):
+
+```powershell
+New-ExceedioSafeAttachmentPolicy -Name 'FabrikamPolicy' -Domains fabrikam.com
 ```

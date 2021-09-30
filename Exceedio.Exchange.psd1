@@ -12,7 +12,7 @@
 RootModule = 'Exceedio.Exchange.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.3'
+ModuleVersion = '0.0.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -71,10 +71,12 @@ RequiredModules = @('ExchangeOnlineManagement')
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
     'Connect-ExceedioExchangeOnline',
+    'Connect-ExceedioIPPSSession',
     'Get-ExceedioSafeAttachmentPolicy',
     'Get-ExceedioSafeLinksPolicy',
     'New-ExceedioSafeAttachmentPolicy',
-    'New-ExceedioSafeLinksPolicy'
+    'New-ExceedioSafeLinksPolicy',
+    'New-ExceedioPhishSimOverridePolicy'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

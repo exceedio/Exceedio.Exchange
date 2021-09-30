@@ -30,6 +30,40 @@ function Connect-ExceedioExchangeOnline {
     Connect-ExchangeOnline -UserPrincipalName $UserPrincipalName -DelegatedOrganization $DelegatedOrganization
 }
 
+function Connect-ExceedioIPPSSession {
+    <#
+    .SYNOPSIS
+    Use the Connect-ExceedioIPPSSession cmdlet in the Exchange Online PowerShell V2 module to connect to
+    Security & Compliance Center PowerShell or standalone Exchange Online Protection PowerShell using modern
+    authentication. The cmdlet works for MFA or non-MFA enabled accounts.
+    .PARAMETER UserPrincipalName
+    Username in username@contoso.com format.
+    .PARAMETER DelegatedOrganization
+    Domain name in contoso.com format.
+    .EXAMPLE
+    Connect-ExceedioIPPSSession -UserPrincipalName alice@contoso.com -DelegatedOrganization fabrikam.com
+    .NOTES
+    This is a helper function for Connect-IPPSSession which is part of the Exchange Online PowerShell V2
+    module. See https://docs.microsoft.com/en-us/powershell/module/exchange/connect-ippssession?view=exchange-ps
+    for details about that function.
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [String]
+        $UserPrincipalName,
+        [Parameter()]
+        [String]
+        $DelegatedOrganization
+    )
+    $module = Get-InstalledModule -Name ExchangeOnlineManagement
+    if ($null -eq $module -or $module.Version -lt '2.0.5') {
+        Write-Warning "Module ExchangeOnlineManagement doesn't exist or is out of date; Install-Module ExchangeOnlineManagement -AllowClobber -Force"
+        return
+    }
+    Connect-IPPSSession -UserPrincipalName $UserPrincipalName -DelegatedOrganization $DelegatedOrganization
+}
+
 function Get-ExceedioSafeLinksPolicy {
     <#
     .SYNOPSIS
@@ -232,4 +266,56 @@ function New-ExceedioSafeAttachmentPolicy {
             | Out-Null
     }
     Write-Output "Policy '$Name' successfully created; Use Get-ExceedioSafeAttachmentPolicy to audit"
+}
+
+function New-ExceedioPhishSimOverridePolicy {
+    <#
+    .SYNOPSIS
+    Creates a standard phish sim override policy to override phishing simulations. The parameter
+    defaults are appropriate for allowing phishing simulations from KnowBe4.
+    .PARAMETER PolicyName
+    The name of the policy. Defaults to 'PhishSimOverridePolicy' and should not be changed.
+    .PARAMETER RuleName
+    The name of the policy. Defaults to 'PhishSimOverrideRule' and should not be changed.
+    .PARAMETER SenderDomainIs
+    Comma-separated list of domain names that the policy applies to.
+    .PARAMETER SenderIpRanges
+    Comma-separated list of IP addresses or IP address CIDR blocks that the policy applies to.
+    .EXAMPLE
+    New-ExceedioPhishSimOverridePolicy
+    .EXAMPLE
+    New-ExceedioPhishSimOverridePolicy -SenderDomainIs somedomain.com -SenderIpRanges 8.8.8.8,8.8.4.4
+    .NOTES
+    The documentation for New-PhishSimOverridePolicy and New-PhishSimOverrideRule state that the
+    Name parameter for both have no effect and the names will always be PhishSimOverridePolicy and
+    PhishSimOverrideRule respectively. The parameters are included for completeness but should not
+    be overridden.
+    See https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/configure-advanced-delivery
+    for more information.
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [String]
+        $PolicyName = 'PhishSimOverridePolicy',
+        [Parameter()]
+        [String]
+        $RuleName = 'PhishSimOverrideRule',
+        [Parameter()]
+        [String[]]
+        $SenderDomainIs = 'psm.knowbe4.com',
+        [Parameter()]
+        [String[]]
+        $SenderIpRanges = @('147.160.167.0/26','23.21.109.197','23.21.109.212')
+    )
+
+    New-PhishSimOverridePolicy `
+        -Name $PolicyName `
+        -Enabled $true
+    
+    New-PhishSimOverrideRule `
+        -Name $RuleName `
+        -Policy $PolicyName `
+        -SenderDomainIs $SenderDomainIs `
+        -SenderIpRanges $SenderIpRanges
 }

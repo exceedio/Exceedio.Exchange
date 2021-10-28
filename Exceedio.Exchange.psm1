@@ -257,6 +257,8 @@ function New-ExceedioSafeAttachmentPolicy {
     if (-not $redirectMailbox) {
         Write-Output "Creating shared mailbox $redirectAddress..."
         New-Mailbox -Name "Blocked Email" -DisplayName "Blocked Email" -Alias blockedemail -Shared
+    } else {
+        Write-Output "Mailbox $redirectAddress already exists; skipping creation of shared mailbox to hold blocked email"
     }
     $policy = New-SafeAttachmentPolicy `
         -Name "$Name" `

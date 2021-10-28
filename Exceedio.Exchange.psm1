@@ -203,14 +203,17 @@ function New-ExceedioSafeAttachmentPolicy {
     Creates a standard Safe Attachment policy and applies it to recipient(s) or recipient domain(s).
     .PARAMETER Name
     The name of the policy. Defaults to 'Default'
+    .PARAMETER PrimaryDomain
+    The primary domain name that the policy applies to (e.g. contoso.com). This is used when determining
+    where to redirect mail that was found to contain malicious attachments and is required.
     .PARAMETER Users
     Comma-separated list of recipients that the policy applies to.
-    .PARAMETER Users
+    .PARAMETER Domains
     Comma-separated list of domain names that the policy applies to.
     .EXAMPLE
-    New-ExceedioSafeAttachmentPolicy -Users pilotuser1@fabrikam.com,pilotuser2@fabrikam.com
+    New-ExceedioSafeAttachmentPolicy -PrimaryDomain fabrikam.com -Users pilotuser1@fabrikam.com,pilotuser2@fabrikam.com
     .EXAMPLE
-    New-ExceedioSafeAttachmentPolicy -Domains fabrikam.com
+    New-ExceedioSafeAttachmentPolicy -PrimaryDomain fabrikam.com -Domains fabrikam.com
     .NOTES
     Running this after the first time will overwrite the existing policy with the same name. Normally
     you would run this first to set up a list of pilot users and then run it again at the end of the
@@ -221,6 +224,9 @@ function New-ExceedioSafeAttachmentPolicy {
         [Parameter()]
         [String]
         $Name = 'Default',
+        [Parameter(Mandatory=$true)]
+        [String]
+        $PrimaryDomain,
         [Parameter()]
         [String[]]
         $Users,
@@ -246,11 +252,18 @@ function New-ExceedioSafeAttachmentPolicy {
             Remove-SafeAttachmentPolicy -Identity "$Name" -Confirm:$false
         }
     }
+    $redirectAddress = "blockedemail@$PrimaryDomain"
+    $redirectMailbox = Get-EXOMailbox $redirectAddress -ErrorAction SilentlyContinue
+    if (-not $redirectMailbox) {
+        Write-Output "Creating shared mailbox $redirectAddress..."
+        New-Mailbox -Name "Blocked Email" -DisplayName "Blocked Email" -Alias blockedemail -Shared
+    }
     $policy = New-SafeAttachmentPolicy `
         -Name "$Name" `
         -Enable $true `
-        -Redirect $false `
-        -Action DynamicDelivery `
+        -Action Block `
+        -Redirect $true `
+        -RedirectAddress $redirectAddress `
         -ActionOnError $true
     if ($policy -and $Users) {
         New-SafeAttachmentRule `

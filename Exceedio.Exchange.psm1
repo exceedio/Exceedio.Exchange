@@ -146,8 +146,8 @@ function New-ExceedioSafeLinksPolicy {
     $policy = New-SafeLinksPolicy `
         -Name "$Name" `
         -DeliverMessageAfterScan $true `
-        -DoNotAllowClickThrough $true `
-        -DoNotTrackUserClicks $false `
+        -AllowClickThrough $false `
+        -TrackClicks $true `
         -EnableForInternalSenders $false `
         -EnableOrganizationBranding $false `
         -EnableSafeLinksForTeams $true `

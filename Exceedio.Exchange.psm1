@@ -336,6 +336,18 @@ function New-ExceedioPhishSimOverridePolicy {
 }
 
 function Test-ExceedioMailboxesForForwarding {
+    <#
+    .SYNOPSIS
+    Tests all mailboxes in an organization for both mailbox-level forwarding and Outlook Inbox
+    rules that may be used for forwarding.
+    .EXAMPLE
+    Test-ExceedioMailboxesForForwarding
+    .NOTES
+    Scammers often set up forwarding rules if they are able to gain access to your email account
+    and then watch for important emails in an effort to improve their chances at a Business Email
+    Compromise attack. Use this cmdlet to investigate suspicious forwarding in an organization.
+    #>
+
     $mailboxes = Get-Mailbox -ResultSize Unlimited
     foreach ($mailbox in $mailboxes) {
         Write-Host "[*] Checking mailbox for $($mailbox.DisplayName)"

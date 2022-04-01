@@ -340,54 +340,66 @@ function Test-ExceedioMailboxesForForwarding {
     .SYNOPSIS
     Tests all mailboxes in an organization for both mailbox-level forwarding and Outlook Inbox
     rules that may be used for forwarding.
+    .PARAMETER Tenents
+    Optional comma-separated list of tenant domain names
     .EXAMPLE
-    Test-ExceedioMailboxesForForwarding
+    Test-ExceedioMailboxesForForwarding -Tenants contoso.onmicrosoft.com,fabrikam.onmicrosoft.com
     .NOTES
     Scammers often set up forwarding rules if they are able to gain access to your email account
     and then watch for important emails in an effort to improve their chances at a Business Email
     Compromise attack. Use this cmdlet to investigate suspicious forwarding in an organization.
     #>
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [String[]]
+        $Tenents
+    )
 
-    $mailboxes = Get-Mailbox -ResultSize Unlimited
-    foreach ($mailbox in $mailboxes) {
-        Write-Host "[*] Checking mailbox for $($mailbox.DisplayName)"
-        if ($mailbox.DeliverToMailboxAndForward) {
-            Write-Host "  [!] Mailbox forwarding is enabled for $($mailbox.DisplayName)" -ForegroundColor Red
-        } else {
-            Write-Host "  [*] Mailbox forwarding is not enabled for $($mailbox.DisplayName)" -ForegroundColor Green
-        }
-        $rules = @(Get-InboxRule -Mailbox $mailbox.UserPrincipalName)
-        if ($rules.Count -gt 0) {
-            Write-Host "  [*] Checking $($rules.Count) Outlook inbox rule(s) for $($mailbox.DisplayName)"
-            foreach ($rule in $rules) {
-                if (($rule.CopyToFolder -or $rule.MoveToFolder) -and ($rule.CopyToFolder -match 'RSS' -or $rule.MoveToFolder -match 'RSS')) {
-                    Write-Host "    [!] Suspect inbox rule forwarding to RSS Feeds '$($rule.Name)' is $($rule.Enabled ? 'enabled' : 'disabled')" -ForegroundColor Red
-                }
-                if ($rule.ForwardTo -or $rule.RedirectTo -or $rule.DeleteMessage -or $rule.ForwardAsAttachmentTo -or $rule.SendTextMessageNotificationTo) {
-                    Write-Host "    [!] Suspect inbox rule '$($rule.Name)' is $($rule.Enabled ? 'enabled' : 'disabled')" -ForegroundColor Yellow
-                    if ($rule.ForwardTo) {
-                        Write-Host "      [>] Forwards to '$($rule.ForwardTo.Split(' '))'"
-                    }
-                    if ($rule.RedirectTo) {
-                        Write-Host "      [>] Redirects to '$($rule.RedirectTo.Split(' '))'"
-                    }
-                    if ($rule.CopyToFolder) {
-                        Write-Host "      [>] Copies to folder '$($rule.CopyToFolder)'"
-                    }
-                    if ($rule.DeleteMessage) {
-                        Write-Host "      [>] Deletes message '$($rule.DeleteMessage)'"
-                    }
-                    if ($rule.ForwardAsAttachmentTo) {
-                        Write-Host "      [>] Forwards message as attachment to '$($rule.ForwardAsAttachmentTo.Split(' '))'"
-                    }
-                    if ($rule.SendTextMessageNotificationTo) {
-                        Write-Host "      [>] Sends SMS to '$($rule.SendTextMessageNotificationTo)'"
-                    }
-                }
+    foreach ($tenant in $Tenents) {
+        Connect-ExchangeOnline -DelegatedOrganization $tenant -ShowBanner:$false
+        $mailboxes = Get-Mailbox -ResultSize Unlimited | Sort-Object DisplayName
+        foreach ($mailbox in $mailboxes) {
+            Write-Host "[*] Checking mailbox for $($mailbox.DisplayName)"
+            if ($mailbox.DeliverToMailboxAndForward) {
+                Write-Host "  [!] Mailbox forwarding is enabled for $($mailbox.DisplayName)" -ForegroundColor Red
+            } else {
+                Write-Host "  [*] Mailbox forwarding is not enabled for $($mailbox.DisplayName)" -ForegroundColor Green
             }
-    
-        } else {
-            Write-Host "  [*] Mailbox $($mailbox.DisplayName) has no Outlook inbox rule" -ForegroundColor Green
+            $rules = @(Get-InboxRule -Mailbox $mailbox.UserPrincipalName)
+            if ($rules.Count -gt 0) {
+                Write-Host "  [*] Checking $($rules.Count) Outlook inbox rule(s) for $($mailbox.DisplayName)"
+                foreach ($rule in $rules) {
+                    if (($rule.CopyToFolder -or $rule.MoveToFolder) -and ($rule.CopyToFolder -match 'RSS' -or $rule.MoveToFolder -match 'RSS')) {
+                        Write-Host "    [!] Suspect inbox rule forwarding to RSS Feeds '$($rule.Name)' is $($rule.Enabled ? 'enabled' : 'disabled')" -ForegroundColor Red
+                    }
+                    if ($rule.ForwardTo -or $rule.RedirectTo -or $rule.DeleteMessage -or $rule.ForwardAsAttachmentTo -or $rule.SendTextMessageNotificationTo) {
+                        Write-Host "    [!] Suspect inbox rule '$($rule.Name)' is $($rule.Enabled ? 'enabled' : 'disabled')" -ForegroundColor Yellow
+                        if ($rule.ForwardTo) {
+                            Write-Host "      [>] Forwards to '$($rule.ForwardTo.Split(' '))'"
+                        }
+                        if ($rule.RedirectTo) {
+                            Write-Host "      [>] Redirects to '$($rule.RedirectTo.Split(' '))'"
+                        }
+                        if ($rule.CopyToFolder) {
+                            Write-Host "      [>] Copies to folder '$($rule.CopyToFolder)'"
+                        }
+                        if ($rule.DeleteMessage) {
+                            Write-Host "      [>] Deletes message '$($rule.DeleteMessage)'"
+                        }
+                        if ($rule.ForwardAsAttachmentTo) {
+                            Write-Host "      [>] Forwards message as attachment to '$($rule.ForwardAsAttachmentTo.Split(' '))'"
+                        }
+                        if ($rule.SendTextMessageNotificationTo) {
+                            Write-Host "      [>] Sends SMS to '$($rule.SendTextMessageNotificationTo)'"
+                        }
+                    }
+                }
+        
+            } else {
+                Write-Host "  [*] Mailbox $($mailbox.DisplayName) has no Outlook inbox rule" -ForegroundColor Green
+            }
         }
+        Disconnect-ExchangeOnline -Confirm:$false | Out-Null
     }
 }
